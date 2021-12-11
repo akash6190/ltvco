@@ -1,4 +1,23 @@
 $(document).ready(function () {
+  const searchOptions = {
+    // currentItem can be oneOf 'email', 'phone'
+    currentItem: "email",
+    itemOptions: {
+      email: {
+        regexp: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
+        errorText: "Please enter a valid email address",
+        placeholderText: "Enter an Email Address",
+        mask: null,
+      },
+      phone: {
+        regexp: /^[\d]{10}$/,
+        errorText: "Please enter a valid phone number",
+        placeholderText: "Enter a phone number",
+        mask: "(***) *** ****"
+      },
+    },
+  };
+
   // Decorator function for API calls.
   function fetchApi() {
     const showLoading = () => {
@@ -59,9 +78,27 @@ $(document).ready(function () {
     }
   });
 
+  function updateInputTexts() {
+    const elem = $(".cta-group .input-group").first();
+    elem
+      .find("input")
+      .attr(
+        "placeholder",
+        searchOptions.itemOptions[searchOptions.currentItem].placeholderText
+      );
+    elem
+      .find(".error-msg")
+      .text(searchOptions.itemOptions[searchOptions.currentItem].errorText);
+  }
+
+  $(".type-selector .nav-link").click((ev) => {
+    searchOptions.currentItem = $(ev.currentTarget).attr("aria-controls");
+    updateInputTexts();
+  });
+
   $('input[type="text"]').keypress(function (event) {
     email = $('input[type="text"]').val().toLowerCase();
-    regEx = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    regEx = searchOptions.itemOptions[searchOptions.currentItem].regexp;
     if (email.match(regEx)) {
       x = true;
       document
@@ -84,7 +121,9 @@ $(document).ready(function () {
       if (x === true) {
         const proxyurl = "";
         const url =
-          "https://ltv-data-api.herokuapp.com/api/v1/records.json?email=" +
+          "https://ltv-data-api.herokuapp.com/api/v1/records.json?" +
+          searchOptions.currentItem +
+          "=" +
           email;
         fetchApi(proxyurl + url)
           .then((response) => response.text())
