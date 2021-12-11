@@ -12,8 +12,8 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body>
-<nav class="navbar d-flex justify-content-between">
+<body class="d-flex flex-column">
+  <nav class="navbar d-flex justify-content-between">
     <div class="container">
       <a href="./index.html">
         <img src="img/logo.svg" width="173" height="25" alt="">
@@ -24,7 +24,7 @@
       </div>
     </div>
   </nav>
-  <section class="above-the-fold">
+  <section class="above-the-fold hide-loading">
     <div class="container">
       <div class="headline text-white text-center mb-4 mb-md-5">
         <h1 class="mb-3">Start Your Search!</h1>
@@ -46,7 +46,12 @@
     </div>
   </section>
 
-  <section class="features">
+  <section class="loading show-loading flex-grow-1 d-none">
+    <img class="spinner" src="img/loading_spinner.gif" />
+    <div class="loading-text">Please wait a moment...</div>
+  </section>
+
+  <section class="features hide-loading">
     <div class="container">
       <div class="headline">
         <h1 class="text-primary text-center mb-2 mb-md-4">Here's How It Works</h1>

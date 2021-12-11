@@ -1,5 +1,30 @@
 $(document).ready(function () {
+  // Decorator function for API calls.
+  function fetchApi() {
+    const showLoading = () => {
+      $(".hide-loading").addClass("d-none");
+      $(".show-loading").removeClass("d-none");
+    };
 
+    const hideLoading = () => {
+      $(".hide-loading").removeClass("d-none");
+      $(".show-loading").addClass("d-none");
+    };
+
+    return new Promise((res, rej) => {
+      showLoading();
+      fetch
+        .apply(this, arguments)
+        .then((resp) => {
+          res(resp);
+          hideLoading();
+        })
+        .catch((err) => {
+          rej(err);
+          hideLoading();
+        });
+    });
+  }
   $("#btn-search").on("click", function (e) {
     e.preventDefault();
     localStorage.clear(); //Clears storage for next request
@@ -14,11 +39,13 @@ $(document).ready(function () {
     }
 
     if (x === true) {
-      document.querySelector('input[type="text"]').parentNode.classList.remove("error");
+      document
+        .querySelector('input[type="text"]')
+        .parentNode.classList.remove("error");
       const proxyurl = "";
       const url =
-        'https://ltv-data-api.herokuapp.com/api/v1/records.json?email=' + email;
-      fetch(proxyurl + url)
+        "https://ltv-data-api.herokuapp.com/api/v1/records.json?email=" + email;
+      fetchApi(proxyurl + url)
         .then((response) => response.text())
         .then(function (contents) {
           localStorage.setItem("userObject", contents);
@@ -26,7 +53,9 @@ $(document).ready(function () {
         })
         .catch((e) => console.log(e));
     } else if (x !== true) {
-      document.querySelector('input[type="text"]').parentNode.classList.add("error");
+      document
+        .querySelector('input[type="text"]')
+        .parentNode.classList.add("error");
     }
   });
 
@@ -35,12 +64,14 @@ $(document).ready(function () {
     regEx = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     if (email.match(regEx)) {
       x = true;
-      document.querySelector('input[type="text"]').parentNode.classList.remove("error");
+      document
+        .querySelector('input[type="text"]')
+        .parentNode.classList.remove("error");
     } else {
       x = false;
     }
-    keycode = (event.keyCode ? event.keyCode : event.which);
-    if (keycode == '13') {
+    keycode = event.keyCode ? event.keyCode : event.which;
+    if (keycode == "13") {
       /**
        * Makes a request to ltv API to search an specific email address.
        * If there's a response, it gets stored in the local storage and redirects to results page
@@ -50,12 +81,12 @@ $(document).ready(function () {
 
       var x, y;
 
-
       if (x === true) {
         const proxyurl = "";
         const url =
-          'https://ltv-data-api.herokuapp.com/api/v1/records.json?email=' + email;
-        fetch(proxyurl + url)
+          "https://ltv-data-api.herokuapp.com/api/v1/records.json?email=" +
+          email;
+        fetchApi(proxyurl + url)
           .then((response) => response.text())
           .then(function (contents) {
             localStorage.setItem("userObject", contents);
@@ -63,9 +94,10 @@ $(document).ready(function () {
           })
           .catch((e) => console.log(e));
       } else if (x !== true) {
-        document.querySelector('input[type="text"]').parentNode.classList.add("error");
+        document
+          .querySelector('input[type="text"]')
+          .parentNode.classList.add("error");
       }
     }
   });
-
 });
