@@ -19,24 +19,24 @@ $(document).ready(function () {
   };
 
   // Decorator function for API calls.
+  const showLoading = () => {
+    $(".hide-loading").addClass("d-none");
+    $(".show-loading").removeClass("d-none");
+  };
+
+  const hideLoading = () => {
+    $(".hide-loading").removeClass("d-none");
+    $(".show-loading").addClass("d-none");
+  };
+
   function fetchApi() {
-    const showLoading = () => {
-      $(".hide-loading").addClass("d-none");
-      $(".show-loading").removeClass("d-none");
-    };
-
-    const hideLoading = () => {
-      $(".hide-loading").removeClass("d-none");
-      $(".show-loading").addClass("d-none");
-    };
-
     return new Promise((res, rej) => {
       showLoading();
       fetch
         .apply(this, arguments)
         .then((resp) => {
           res(resp);
-          hideLoading();
+          // because of page reload there is a flickering issue, hence not hiding the loading icon on successfull result
         })
         .catch((err) => {
           rej(err);
@@ -44,6 +44,7 @@ $(document).ready(function () {
         });
     });
   }
+
   $("#btn-search").on("click", function (e) {
     e.preventDefault();
     localStorage.clear(); //Clears storage for next request
