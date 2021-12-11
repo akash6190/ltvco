@@ -13,7 +13,6 @@ $(document).ready(function () {
         regexp: /^[\d]{10}$/,
         errorText: "Please enter a valid phone number",
         placeholderText: "Enter a phone number",
-        mask: "(***) *** ****"
       },
     },
   };
@@ -45,26 +44,34 @@ $(document).ready(function () {
     });
   }
 
-  $("#btn-search").on("click", function (e) {
-    e.preventDefault();
-    localStorage.clear(); //Clears storage for next request
-    email = $('input[type="text"]').val().toLowerCase();
+  function searchForResults(shouldFetch) {
+    const searchText = $('input[type="text"]').val().toLowerCase();
+    const regEx = searchOptions.itemOptions[searchOptions.currentItem].regexp;
 
-    var x, y;
-    regEx = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-    if (email.match(regEx)) {
-      x = true;
-    } else {
-      x = false;
-    }
-
-    if (x === true) {
+    if (searchText.match(regEx)) {
       document
         .querySelector('input[type="text"]')
         .parentNode.classList.remove("error");
+    } else {
+      document
+        .querySelector('input[type="text"]')
+        .parentNode.classList.add("error");
+      return
+    }
+
+    if (shouldFetch) {
+      /**
+       * Makes a request to ltv API to search an specific searchText address.
+       * If there's a response, it gets stored in the local storage and redirects to results page
+       */
+      localStorage.clear(); //Clears storage for next request
+
       const proxyurl = "";
       const url =
-        "https://ltv-data-api.herokuapp.com/api/v1/records.json?email=" + email;
+        "https://ltv-data-api.herokuapp.com/api/v1/records.json?" +
+        searchOptions.currentItem +
+        "=" +
+        searchText;
       fetchApi(proxyurl + url)
         .then((response) => response.text())
         .then(function (contents) {
@@ -72,21 +79,24 @@ $(document).ready(function () {
           window.location.href = "result.html";
         })
         .catch((e) => console.log(e));
-    } else if (x !== true) {
-      document
-        .querySelector('input[type="text"]')
-        .parentNode.classList.add("error");
     }
+  }
+
+  $("#btn-search").on("click", function (e) {
+    e.preventDefault();
+    searchForResults(true);
   });
 
   function updateInputTexts() {
-    const elem = $(".cta-group .input-group").first();
+    const elem = $(".cta-group .input-group").first().removeClass('error');
     elem
       .find("input")
+      .val('')
       .attr(
         "placeholder",
         searchOptions.itemOptions[searchOptions.currentItem].placeholderText
       );
+
     elem
       .find(".error-msg")
       .text(searchOptions.itemOptions[searchOptions.currentItem].errorText);
@@ -98,46 +108,12 @@ $(document).ready(function () {
   });
 
   $('input[type="text"]').keypress(function (event) {
-    email = $('input[type="text"]').val().toLowerCase();
-    regEx = searchOptions.itemOptions[searchOptions.currentItem].regexp;
-    if (email.match(regEx)) {
-      x = true;
-      document
-        .querySelector('input[type="text"]')
-        .parentNode.classList.remove("error");
-    } else {
-      x = false;
-    }
-    keycode = event.keyCode ? event.keyCode : event.which;
-    if (keycode == "13") {
-      /**
-       * Makes a request to ltv API to search an specific email address.
-       * If there's a response, it gets stored in the local storage and redirects to results page
-       */
+    const keycode = (event.keyCode ? event.keyCode : event.which);
+    if(keycode === '13') {
       event.preventDefault();
-      localStorage.clear(); //Clears storage for next request
-
-      var x, y;
-
-      if (x === true) {
-        const proxyurl = "";
-        const url =
-          "https://ltv-data-api.herokuapp.com/api/v1/records.json?" +
-          searchOptions.currentItem +
-          "=" +
-          email;
-        fetchApi(proxyurl + url)
-          .then((response) => response.text())
-          .then(function (contents) {
-            localStorage.setItem("userObject", contents);
-            window.location.href = "result.html";
-          })
-          .catch((e) => console.log(e));
-      } else if (x !== true) {
-        document
-          .querySelector('input[type="text"]')
-          .parentNode.classList.add("error");
-      }
+      searchForResults(true);
+    } else {
+      searchForResults(false);
     }
   });
 });
