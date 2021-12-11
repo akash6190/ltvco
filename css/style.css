@@ -112,7 +112,7 @@ section {
 }
 
 .type-selector > .label {
-  font-family: Lato-Regular;
+  font-family: "Lato", sans-serif;
   font-size: 16px;
   color: #ffffff;
   letter-spacing: 0;
@@ -304,7 +304,7 @@ section {
 
 .loading .loading-text {
   font-size: 20px;
-  font-family: Lato-Bold;
+  font-family: "Lato", sans-serif;
   color: #004a80;
   font-weight: 700;
 }
